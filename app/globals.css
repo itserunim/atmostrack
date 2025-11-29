@@ -1,26 +1,50 @@
-@import "tailwindcss";
+@import "tailwindcss/base";
+@import "tailwindcss/components";
+@import "tailwindcss/utilities";
 
+/* CSS Variables for Neumorphism */
 :root {
-  --background: #ffffff;
-  --foreground: #171717;
+  --neu-bg-light: #e9eef7;
+  --neu-shadow: rgba(163, 177, 198, 0.6);
+  --neu-highlight: rgba(255, 255, 255, 0.9);
+
+
+  --neu-bg-dark: #0a0f1a;
+  --neu-shadow-dark: rgba(0, 0, 0, 0.7);
+  --neu-highlight-dark: rgba(255, 255, 255, 0.03);
 }
 
-@theme inline {
-  --color-background: var(--background);
-  --color-foreground: var(--foreground);
-  --font-sans: var(--font-geist-sans);
-  --font-mono: var(--font-geist-mono);
+/* Default Atmos Body Background */
+.atmos-body {
+  background: var(--neu-bg-light);
+  transition: background 0.6s ease;
 }
 
+/* Neumorphism Utility */
+.neumorph {
+  background: var(--neu-bg-light);
+  box-shadow: 14px 14px 28px var(--neu-shadow), -10px -10px 20px var(--neu-highlight);
+  border-radius: 20px;
+  padding: 1.5rem;
+}
+
+/* Dark Mode */
 @media (prefers-color-scheme: dark) {
-  :root {
-    --background: #0a0a0a;
-    --foreground: #ededed;
+.atmos-body {
+    background: var(--neu-bg-dark);
   }
+.neumorph {
+    background: var(--neu-bg-dark);
+    box-shadow: 14px 14px 28px var(--neu-shadow-dark), -10px -10px 20px var(--neu-highlight-dark);
+  } 
 }
 
-body {
-  background: var(--background);
-  color: var(--foreground);
-  font-family: Arial, Helvetica, sans-serif;
+/* Soft Text */
+.text-soft {
+  color: #6b7280;
+}
+
+/* Smooth Layout */
+html, body {
+  scroll-behavior: smooth;
 }
