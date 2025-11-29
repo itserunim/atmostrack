@@ -1,16 +1,20 @@
-import React from "react";
+"use client";
+import React, { useState, useEffect, useRef } from "react";
 
-const MQTTPanel = ({ topics, lastUpdate, status }) => {
+const MQTTPanel = ({ topics = ['weather/temp','weather/humidity','weather/wind'], lastUpdate = '3 sec ago', status = true }) => {
   return (
-    <div className="bg-white dark:bg-gray-800 rounded-xl shadow p-4 w-80">
-      <h2 className="text-lg font-semibold text-gray-700 dark:text-gray-200">MQTT Panel</h2>
-      <p className="text-sm text-gray-500">Status: {status ? "Connected" : "Disconnected"}</p>
-      <p className="text-sm text-gray-500">Last Update: {lastUpdate}</p>
-      <ul className="mt-2 text-sm text-gray-600 dark:text-gray-300">
-        {topics.map((topic, index) => (
-          <li key={index}>{topic}</li>
-        ))}
-      </ul>
+    <div className="neumorph p-6 flex flex-col items-center justify-center w-full">
+      <h3 className="text-sm uppercase text-white/90 mb-2">MQTT Panel</h3>
+      <div className="text-xs text-white/70">Last Update</div>
+      <div className="text-sm text-white/90 mb-4">{lastUpdate}</div>
+      <div className="px-6 py-2 rounded-full bg-green-400 text-white text-xl font-semibold mb-4 flex items-center justify-center w-44">
+        <span className="mr-3">{status ? 'Connected' : 'Disconnected'}</span>
+        <span className={`w-5 h-5 rounded-full bg-white ${status ? '' : 'opacity-40'}`} />
+      </div>
+      <div className="text-sm text-white/70">Topics</div>
+      <div className="text-sm text-white/60 mt-2 text-center">
+        {topics.join('  | ')}
+      </div>
     </div>
   );
 };

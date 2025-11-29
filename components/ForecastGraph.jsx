@@ -1,33 +1,53 @@
+"use client";
 import React from "react";
 import { Line } from "react-chartjs-2";
+import {
+  Chart as ChartJS,
+  CategoryScale,
+  LinearScale,
+  PointElement,
+  LineElement,
+  Title,
+  Tooltip,
+  Legend,
+} from 'chart.js';
 
-const ForecastGraph = ({ labels, data }) => {
+ChartJS.register(CategoryScale, LinearScale, PointElement, LineElement, Title, Tooltip, Legend);
+
+const ForecastGraph = ({ labels = [], data = [] }) => {
   const chartData = {
     labels,
     datasets: [
       {
-        label: "Temperature (°C)",
+        label: 'Next 7 day(s)',
         data,
-        borderColor: "#f87171",
-        backgroundColor: "rgba(248, 113, 113, 0.2)",
+        borderColor: '#fb7185',
+        backgroundColor: 'rgba(251,113,133,0.12)',
         tension: 0.3,
-      },
-    ],
+        pointRadius: 4,
+        pointBackgroundColor: '#fb7185'
+      }
+    ]
   };
 
   const options = {
     responsive: true,
+    maintainAspectRatio: false,
     plugins: {
-      legend: { display: false },
+      legend: { display: false }
     },
     scales: {
-      y: { beginAtZero: false },
-    },
+      x: { grid: { display: false }, ticks: { color: 'rgba(255,255,255,0.9)' } },
+      y: { grid: { color: 'rgba(255,255,255,0.06)' }, ticks: { color: 'rgba(255,255,255,0.9)' } }
+    }
   };
 
   return (
-    <div className="bg-white dark:bg-gray-800 rounded-xl shadow p-4 w-full">
-      <Line data={chartData} options={options} />
+    <div className="neumorph p-6 w-full h-72">
+      <div className="text-sm text-white/90 mb-4">Next 7 day(s)</div>
+      <div className="w-full h-56">
+        <Line data={chartData} options={options} />
+      </div>
     </div>
   );
 };
