@@ -1,11 +1,20 @@
-export default function HomePage() {
-  return (
-    <div className="w-full h-full flex flex-col items-center justify-center py-20 text-center">
-      <h1 className="text-5xl font-bold mb-4">Welcome to AtmosTrack</h1>
-      <p className="text-lg text-slate-600 max-w-xl">
-        A responsive, neumorphism-inspired weather monitoring dashboard with
-        real‑time MQTT data and dynamic time‑based background.
-      </p>
-    </div>
-  );
+export default function DashboardPage() {
+    return (
+        <div className="dashboard-container p-6">
+        <h1 className="text-3xl font-bold mb-6">Dashboard Overview</h1>
+
+            <div className="grid grid-cols-1 md:grid-cols-3 gap-6">
+                <div className="neumorph">Temperature Card Placeholder</div>
+                <div className="neumorph">Humidity Card Placeholder</div>
+                <div className="neumorph">Wind Card Placeholder</div>
+            </div>
+
+            <div className="mt-8 neumorph">Forecast Graph Placeholder</div>
+
+            <div className="mt-8 grid grid-cols-1 md:grid-cols-2 gap-6">
+                <div className="neumorph">MQTT Panel Placeholder</div>
+                <div className="neumorph">Control Panel Placeholder</div>
+            </div>
+        </div>
+    );
 }
