@@ -1,0 +1,26 @@
+"use client";
+import React from "react";
+import { CircularProgressbar, buildStyles } from 'react-circular-progressbar';
+import 'react-circular-progressbar/dist/styles.css';
+
+const HumidityCard = ({ humidity = 90 }) => {
+  return (
+    <div className="neumorph p-6 flex flex-col items-center justify-center w-full">
+      <h2 className="text-sm font-bold text-white/90 uppercase">Humidity</h2>
+      <div className="w-40 h-40 my-4">
+        <CircularProgressbar
+          value={humidity}
+          text={`${humidity}%`}
+          styles={buildStyles({
+            textColor: 'rgba(255,255,255,0.95)',
+            pathColor: '#60a5fa',
+            trailColor: 'rgba(255,255,255,0.12)',
+          })}
+        />
+      </div>
+      <p className="text-sm text-white/80">{humidity > 70 ? 'Wetter environment.' : 'Comfortable environment.'}</p>
+    </div>
+  );
+};
+
+export default HumidityCard;
