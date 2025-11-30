@@ -15,7 +15,7 @@ export const metadata = {
 export default function RootLayout({ children }) {
   return (
     <html lang="en">
-      <body className="atmos-body min-h-screen flex flex-col">
+      <body suppressHydrationWarning={true} className="atmos-body min-h-screen flex flex-col">
         <main className="flex-1">{children}</main>
       </body>
     </html>

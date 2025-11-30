@@ -17,7 +17,7 @@ ChartJS.register(CategoryScale, LinearScale, PointElement, LineElement, Title, T
 const ForecastGraph = ({ labels = [], data = [] }) => {
   const [range, setRange] = React.useState('daily');
 
-  // sample datasets for hourly, daily and weekly
+  // sample datasets for hourly and daily
   const sample = {
     hourly: {
       labels: Array.from({ length: 24 }, (_, i) => `${i}:00`),
@@ -27,13 +27,9 @@ const ForecastGraph = ({ labels = [], data = [] }) => {
       labels: ['Mon','Tue','Wed','Thu','Fri','Sat','Sun'],
       data: [22,21,22,23,24,25,23]
     },
-    weekly: {
-      labels: ['Wk1','Wk2','Wk3','Wk4'],
-      data: [150, 170, 165, 180]
-    }
   };
 
-  const current = range === 'hourly' ? sample.hourly : range === 'weekly' ? sample.weekly : sample.daily;
+  const current = range === 'hourly' ? sample.hourly : sample.daily;
   // choose a line color based on current hour to match the TimeBasedBackground
   const hour = (new Date()).getHours();
   let lineColor = '#fb7185';
@@ -61,7 +57,7 @@ const ForecastGraph = ({ labels = [], data = [] }) => {
     labels: current.labels,
     datasets: [
       {
-        label: range === 'weekly' ? 'Weekly' : range === 'hourly' ? 'Hourly' : 'Daily',
+        label: range === 'hourly' ? 'Hourly' : 'Daily',
         data: current.data,
         borderColor: lineColor,
         backgroundColor: fillColor,
@@ -87,11 +83,10 @@ const ForecastGraph = ({ labels = [], data = [] }) => {
   return (
     <div className="neumorph p-6 w-full h-full">
       <div className="flex items-center justify-between mb-4">
-        <div className="font-semibold text-m text-white/90">{range === 'hourly' ? 'Next 24 hours' : range === 'weekly' ? 'Next 4 weeks' : 'Next 7 day(s)'}</div>
+        <div className="font-semibold text-m text-white/90">{range === 'hourly' ? 'Next 24 hours' : 'Next 7 day(s)'}</div>
         <div className="flex items-center space-x-2">
           <button onClick={() => setRange('hourly')} className={`px-3 py-1 rounded ${range==='hourly' ? 'bg-white/20 text-white' : 'text-white/60'}`}>Hourly</button>
           <button onClick={() => setRange('daily')} className={`px-3 py-1 rounded ${range==='daily' ? 'bg-white/20 text-white' : 'text-white/60'}`}>Daily</button>
-          <button onClick={() => setRange('weekly')} className={`px-3 py-1 rounded ${range==='weekly' ? 'bg-white/20 text-white' : 'text-white/60'}`}>Weekly</button>
         </div>
       </div>
       <div className="w-full h-56">

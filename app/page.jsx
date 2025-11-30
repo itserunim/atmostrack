@@ -7,7 +7,6 @@ import ForecastGraph from "../components/ForecastGraph";
 import MQTTPanel from "../components/MQTTPanel";
 import ControlPanel from "../components/ControlPanel";
 import StatusIndicator from "../components/StatusIndicator";
-import ThemeSwitcher from "../components/ThemeSwitcher";
 
 export default function DashboardPage() {
     const now = new Date();
@@ -26,13 +25,12 @@ export default function DashboardPage() {
         <TimeBasedBackground>
             <div className="max-w-7xl mx-auto p-6">
                 <header className="neumorph p-4 flex items-center justify-between mb-6">
-                    <div>
-                        <h1 className="text-3xl font-bold text-gray-900 dark:text-gray-100">AtmosTrack</h1>
-                        <p className="text-sm text-gray-600 dark:text-gray-300">Updated: {now.toLocaleTimeString()}</p>
+                    <div className="flex items-center space-x-4">
+                        <img src="/atmostrack-logo.svg" alt="AtmosTrack" className="w-50 h-auto" />
                     </div>
                     <div className="flex items-center space-x-4">
                         <StatusIndicator status="online" />
-                        <ThemeSwitcher />
+                        <p className="text-sm text-gray-600 dark:text-gray-300">Updated: {now.toLocaleTimeString()}</p>
                     </div>
                 </header>
 
@@ -49,7 +47,7 @@ export default function DashboardPage() {
                         {/* Top small cards */}
                         <div className="grid grid-cols-1 sm:grid-cols-3 gap-6">
                             <div className="">
-                                <HumidityCard humidity={91} />
+                                <HumidityCard humidity={70} />
                             </div>
                             <div className="">
                                 <WindCard speed={8} direction={'SE'} />
