@@ -25,7 +25,7 @@ export default function DashboardPage() {
     return (
         <TimeBasedBackground>
             <div className="max-w-7xl mx-auto p-6">
-                <header className="flex items-center justify-between mb-6">
+                <header className="neumorph p-4 flex items-center justify-between mb-6">
                     <div>
                         <h1 className="text-3xl font-bold text-gray-900 dark:text-gray-100">AtmosTrack</h1>
                         <p className="text-sm text-gray-600 dark:text-gray-300">Updated: {now.toLocaleTimeString()}</p>
@@ -40,7 +40,7 @@ export default function DashboardPage() {
                     {/* Left vertical thermometer column */}
                     <aside className="col-span-12 md:col-span-2">
                         <div className="neumorph h-full flex items-center justify-center p-4">
-                            <TemperatureCard current={28} min={24} max={32} />
+                            <TemperatureCard current={25} min={15} max={45} />
                         </div>
                     </aside>
 
@@ -49,7 +49,7 @@ export default function DashboardPage() {
                         {/* Top small cards */}
                         <div className="grid grid-cols-1 sm:grid-cols-3 gap-6">
                             <div className="">
-                                <HumidityCard humidity={90} />
+                                <HumidityCard humidity={91} />
                             </div>
                             <div className="">
                                 <WindCard speed={8} direction={'SE'} />
