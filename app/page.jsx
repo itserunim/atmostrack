@@ -29,7 +29,7 @@ export default function DashboardPage() {
             <div className="min-h-screen mx-auto p-6 space-y-6">
                 <header className="neumorph p-4 flex items-center justify-between mb-6">
                     <div className="flex items-center space-x-4">
-                        <img src="/atmostrack-logo.svg" alt="AtmosTrack" className="w-50 h-auto" />
+                        <img src="/atmostrack-logo.svg" alt="AtmosTrack" className="w-60 h-auto" />
                     </div>
                     <div className="flex items-center space-x-4">
                         <div className="font-bold text-sm text-white/95">Subscribed Topics:</div>
@@ -41,7 +41,7 @@ export default function DashboardPage() {
                     </div>
                 </header>
 
-                <div className="grid grid-cols-5 grid-rows-2 gap-6 auto-rows-fr">
+                <div className="grid grid-cols-5 grid-rows-2 gap-6">
                                         
                     <div className="row-span-2 neumorph flex items-center justify-center p-4 w-full h-full">
                         <TemperatureCard current={30} min={15} max={45} />

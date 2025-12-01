@@ -111,7 +111,7 @@ const ForecastGraph = () => {
   const title = `${prettyMetric} — ${range}`;
 
   return (
-    <div className="neumorph p-4 w-full h-full rounded-xl">
+    <div className="neumorph p-2 w-full h-full rounded-xl">
 
       {/* ----- CONTROLS AREA ----- */}
       <div className="flex items-center justify-between mb-4">
