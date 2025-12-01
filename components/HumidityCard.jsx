@@ -5,9 +5,9 @@ import 'react-circular-progressbar/dist/styles.css';
 
 const HumidityCard = ({ humidity = 90 }) => {
   return (
-    <div className="neumorph p-6 flex flex-col items-center justify-center w-full">
-      <h2 className="text-sm font-bold text-white/90 uppercase">Humidity</h2>
-      <div className="w-40 h-40 my-4">
+    <div className="neumorph p-6 flex flex-col items-center justify-center text-center w-full h-full">
+      <h2 className="text-xl font-bold text-white/95 uppercase tracking-wide">Humidity</h2>
+      <div className="w-40 h-40 my-4 font-semibold">
         <CircularProgressbar
           value={humidity}
           text={`${humidity}%`}
@@ -18,7 +18,7 @@ const HumidityCard = ({ humidity = 90 }) => {
           })}
         />
       </div>
-      <p className="text-sm text-white/80">{humidity > 70 ? 'Wetter environment.' : 'Comfortable environment.'}</p>
+      <p className="text-sm text-white/95">{humidity > 70 ? 'Wetter environment.' : 'Comfortable environment.'}</p>
     </div>
   );
 };

@@ -75,7 +75,7 @@ const ForecastGraph = ({ labels = [], data = [] }) => {
       legend: { display: false }
     },
     scales: {
-      x: { grid: { display: false }, ticks: { color: 'rgba(255,255,255,0.9)' } },
+      x: { grid: { display: false }, ticks: { color: 'rgba(255, 255, 255, 1)' } },
       y: { grid: { color: 'rgba(255,255,255,0.06)' }, ticks: { color: 'rgba(255,255,255,0.9)' } }
     }
   };

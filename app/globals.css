@@ -83,3 +83,90 @@
 html, body {
   scroll-behavior: smooth;
 }
+
+/* Responsive Globals for AtmosTrack */
+
+/* Fluid Typography */
+html {
+  font-size: clamp(14px, 1.5vw, 17px);
+}
+
+/* Global Section Spacing */
+.section {
+  padding: clamp(1rem, 3vw, 3rem);
+}
+
+/* Responsive Container */
+.container-responsive {
+  width: 100%;
+  max-width: 1400px;
+  margin: 0 auto;
+  padding-left: clamp(0.8rem, 2vw, 2rem);
+  padding-right: clamp(0.8rem, 2vw, 2rem);
+}
+
+/* Responsive Dashboard Grid */
+.grid-auto {
+  display: grid;
+  gap: clamp(1rem, 2vw, 2rem);
+}
+
+/* Breakpoints */
+@media (max-width: 640px) {
+  /* Mobile: stack elements, full width cards */
+  .grid-auto {
+    grid-template-columns: 1fr;
+  }
+
+  .neumorph {
+    padding: 1.2rem;
+    border-radius: 16px;
+  }
+
+  .card-title {
+    font-size: 1.1rem;
+  }
+}
+
+@media (min-width: 641px) and (max-width: 1024px) {
+  /* Tablet: 2 columns */
+  .grid-auto {
+    grid-template-columns: repeat(2, 1fr);
+  }
+
+  .neumorph {
+    padding: 1.4rem;
+  }
+}
+
+@media (min-width: 1025px) {
+  /* Desktop: 3 or more columns depending on page.jsx */
+  .grid-auto {
+    grid-template-columns: repeat(auto-fit, minmax(280px, 1fr));
+  }
+
+  .neumorph {
+    padding: 1.6rem;
+  }
+}
+
+/* Fluid Card Content */
+.card-number {
+  font-size: clamp(1.8rem, 4vw, 3rem);
+  font-weight: 600;
+}
+
+.card-text {
+  font-size: clamp(0.9rem, 1.2vw, 1.2rem);
+}
+
+/* Responsive Icon */
+.icon-responsive {
+  width: clamp(24px, 6vw, 48px);
+  height: clamp(24px, 6vw, 48px);
+}
+
+/* Prevent Layout Overflow */
+* {
+  max-width: 100%;
+}

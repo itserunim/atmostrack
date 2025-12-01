@@ -30,13 +30,13 @@ const WindCard = ({ speed = 8, direction = 'SE' }) => {
 
   return (
     <div className="neumorph p-6 flex flex-col items-center justify-center h-full w-full text-center">
-      <h2 className="text-sm font-bold text-white/90 uppercase">Wind</h2>
+      <h2 className="text-xl font-bold text-white/95 uppercase tracking-wide">Wind</h2>
       <div className={`${iconSize} text-white/95 my-2 transition-transform`}>
         <Icon />
       </div>
-      <div className="text-4xl font-bold text-white/95">{speed} {direction}</div>
-      <div className="text-sm text-white/80 mt-1">{speed} km/h</div>
-      <p className="text-sm text-white/70 mt-3">{description}</p>
+      <div className="text-4xl font-bold text-white/95">{direction}</div>
+      <div className="text-sm text-white/95 mt-1">{speed} km/h</div>
+      <p className="text-sm text-white/95 mt-3">{description}</p>
     </div>
   );
 };

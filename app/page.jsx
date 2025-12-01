@@ -3,8 +3,9 @@ import TimeBasedBackground from "../components/TimeBasedBackground";
 import TemperatureCard from "../components/TemperatureCard";
 import HumidityCard from "../components/HumidityCard";
 import WindCard from "../components/WindCard";
+import PressureCard from "../components/PressureCard";
 import ForecastGraph from "../components/ForecastGraph";
-import MQTTPanel from "../components/MQTTPanel";
+import RainCard from "../components/RainCard";
 import ControlPanel from "../components/ControlPanel";
 import StatusIndicator from "../components/StatusIndicator";
 
@@ -21,52 +22,51 @@ export default function DashboardPage() {
         { id: 3, name: "Vent", state: false },
     ];
 
+    const topics = ['weather/temp','weather/humidity','weather/pressure', 'weather/wind', 'weather/rain'];
+
     return (
         <TimeBasedBackground>
-            <div className="max-w-7xl mx-auto p-6">
+            <div className="min-h-screen mx-auto p-6 space-y-6">
                 <header className="neumorph p-4 flex items-center justify-between mb-6">
                     <div className="flex items-center space-x-4">
                         <img src="/atmostrack-logo.svg" alt="AtmosTrack" className="w-50 h-auto" />
                     </div>
                     <div className="flex items-center space-x-4">
+                        <div className="font-bold text-sm text-white/95">Subscribed Topics:</div>
+                        <div className="text-sm text-white/95 text-center">
+                            {topics.join(' | ')}
+                        </div>
                         <StatusIndicator status="online" />
-                        <p className="text-sm text-gray-600 dark:text-gray-300">Updated: {now.toLocaleTimeString()}</p>
+                        <p className="text-sm text-white/95">Updated: {now.toLocaleTimeString()}</p>
                     </div>
                 </header>
 
-                <div className="grid grid-cols-12 gap-6">
-                    {/* Left vertical thermometer column */}
-                    <aside className="col-span-12 md:col-span-2">
-                        <div className="neumorph h-full flex items-center justify-center p-4">
-                            <TemperatureCard current={25} min={15} max={45} />
-                        </div>
-                    </aside>
+                <div className="grid grid-cols-5 grid-rows-2 gap-6 auto-rows-fr">
+                                        
+                    <div className="row-span-2 neumorph flex items-center justify-center p-4 w-full h-full">
+                        <TemperatureCard current={30} min={15} max={45} />
+                    </div>
 
-                    {/* Right main area */}
-                    <section className="col-span-12 md:col-span-10 space-y-6">
-                        {/* Top small cards */}
-                        <div className="grid grid-cols-1 sm:grid-cols-3 gap-6">
-                            <div className="">
-                                <HumidityCard humidity={70} />
-                            </div>
-                            <div className="">
-                                <WindCard speed={8} direction={'SE'} />
-                            </div>
-                            <div className="">
-                                <MQTTPanel />
-                            </div>
-                        </div>
+                    <div className="w-full h-full">
+                        <HumidityCard humidity={30} />
+                    </div>
+                    <div className="w-full h-full">
+                        <PressureCard pressure={1013} />
+                    </div>
+                    <div className="w-full h-full">
+                        <WindCard speed={20} direction={'SE'} />
+                    </div>
 
-                        {/* Middle area: large forecast and control panel */}
-                        <div className="grid grid-cols-1 lg:grid-cols-3 gap-6 items-start">
-                            <div className="lg:col-span-2">
-                                <ForecastGraph labels={sampleForecast.labels} data={[22,21,22,23,24,25,23]} />
-                            </div>
-                            <div className="lg:col-span-1">
-                                <ControlPanel initial={true} />
-                            </div>
-                        </div>
-                    </section>
+                    <div className="w-full h-full">
+                        <RainCard intensity={2.5} />
+                    </div>
+                    <div className="col-start-5 row-start-2">
+                        <ControlPanel initial={true} />
+                    </div>
+
+                    <div className="col-span-3 col-start-2 row-start-2">
+                        <ForecastGraph labels={sampleForecast.labels} data={[22,21,22,23,24,25,23]} />
+                    </div>
                 </div>
             </div>
         </TimeBasedBackground>
