@@ -29,7 +29,7 @@ const RainCard = ({ intensity = 2.5 }) => {
   return (
     <div className="neumorph flex flex-col items-center justify-center h-full w-full text-center">
       <h2 className="text-xl font-bold text-white/95 uppercase tracking-wide">Precipitation</h2>
-      <div className={`${iconSize} text-white/95 transition-transform`}>
+      <div className={`${iconSize} h-25 text-white/95 transition-transform`}>
         <Icon />
       </div>
       <div className="text-l font-bold text-white/95">Intensity: {intensity} mm/h</div>

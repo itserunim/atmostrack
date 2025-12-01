@@ -48,7 +48,7 @@ export default function DashboardPage() {
                     </div>
 
                     <div className="w-full h-full">
-                        <HumidityCard humidity={30} />
+                        <HumidityCard humidity={65} />
                     </div>
                     <div className="w-full h-full">
                         <PressureCard pressure={1013} />

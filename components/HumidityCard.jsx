@@ -13,7 +13,7 @@ const HumidityCard = ({ humidity = 90 }) => {
           text={`${humidity}%`}
           styles={buildStyles({
             textColor: 'rgba(255,255,255,0.95)',
-            pathColor: '#60a5fa',
+            pathColor: '#60fa60ff',
             trailColor: 'rgba(255,255,255,0.12)',
           })}
         />

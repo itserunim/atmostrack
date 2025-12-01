@@ -16,15 +16,15 @@ const WindCard = ({ speed = 8, direction = 'SE' }) => {
 
   if (category === 'calm') {
     Icon = WiWindy;
-    iconSize = 'text-8xl';
+    iconSize = 'text-7xl';
     description = 'Calm conditions — pleasant and still.';
   } else if (category === 'breeze') {
     Icon = WiCloudyWindy;
-    iconSize = 'text-8xl';
+    iconSize = 'text-7xl';
     description = 'The breeze makes you feel comfortable.';
   } else {
     Icon = WiStrongWind;
-    iconSize = 'text-6xl';
+    iconSize = 'text-7xl';
     description = 'Strong wind — secure loose objects and take care.';
   }
 
@@ -34,8 +34,8 @@ const WindCard = ({ speed = 8, direction = 'SE' }) => {
       <div className={`${iconSize} text-white/95 my-2 transition-transform`}>
         <Icon />
       </div>
-      <div className="text-4xl font-bold text-white/95">{direction}</div>
-      <div className="text-sm text-white/95 mt-1">{speed} km/h</div>
+      <div className="text-3xl font-bold text-white/95">{direction}</div>
+      <div className="text-m text-white/95 mt-1">{speed} km/h</div>
       <p className="text-sm text-white/95 mt-3">{description}</p>
     </div>
   );

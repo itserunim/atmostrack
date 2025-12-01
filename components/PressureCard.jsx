@@ -53,15 +53,15 @@ const PressureCard = ({ pressure: initial = 1013 }) => {
   return (
     <div className="neumorph flex flex-col items-center justify-center w-full h-full text-center">
       <h2 className="text-xl font-bold text-white/95 uppercase tracking-wide">Pressure</h2>
-      <div className="w-full h-full">
+      <div className="w-full h-30 flex items-center justify-center">
         <GaugeChart
             id="pressure-gauge"
             value={pct}
             type="semicircle"
             arc={{
-                width: 0.25,
+                width: 0.3,
                 padding: 0,
-                cornerRadius: 5,
+                cornerRadius: 4,
                 gradient: true,
                 subArcs: [
                 { limit: 10, color: "#1d37e3ff" },
@@ -73,8 +73,8 @@ const PressureCard = ({ pressure: initial = 1013 }) => {
             }}
             pointer={{
                 type: "arrow",
-                color: "#ccc",
-                length: 0.6,
+                color: "#ffffffff",
+                length: 0.7,
                 width: 15,
                 elastic: false
             }}
