@@ -10,86 +10,148 @@ import {
   Title,
   Tooltip,
   Legend,
-} from 'chart.js';
+} from "chart.js";
 
 ChartJS.register(CategoryScale, LinearScale, PointElement, LineElement, Title, Tooltip, Legend);
 
-const ForecastGraph = ({ labels = [], data = [] }) => {
-  const [range, setRange] = React.useState('daily');
+const ForecastGraph = () => {
+  const [range, setRange] = React.useState("1D");   // 1D, 5D
+  const [metric, setMetric] = React.useState("temperature");
 
-  // sample datasets for hourly and daily
-  const sample = {
-    hourly: {
-      labels: Array.from({ length: 24 }, (_, i) => `${i}:00`),
-      data: Array.from({ length: 24 }, () => 18 + Math.round(Math.random() * 8 + Math.random() * 2))
-    },
-    daily: {
-      labels: ['Mon','Tue','Wed','Thu','Fri','Sat','Sun'],
-      data: [22,21,22,23,24,25,23]
-    },
+  // ----- RANGE LABELS -----
+  const labels1D = Array.from({ length: 12 }, (_, i) => `${8 + i}:00`); // 8AM–8PM
+  const labels5D = ["Day 1","Day 2","Day 3","Day 4","Day 5"];
+
+  // ----- RANDOMIZED METRIC VALUES (demo only) -----
+  const sampleData = (n, base, v) =>
+    Array.from({ length: n }, (_, i) => {
+      const noise = Math.sin(i / 2) * v + (Math.random() - 0.5) * (v / 2);
+      return Math.round((base + noise) * 10) / 10;
+    });
+
+  const generateData = () => {
+    let labels = range === "1D" ? labels1D : labels5D;
+    let count = labels.length;
+
+    let base = { 
+      temperature: 28, 
+      humidity: 70, 
+      pressure: 1013, 
+      wind: 12, 
+      precipitation: 1 
+    }[metric];
+
+    let variability = { 
+      temperature: 2.3, 
+      humidity: 8, 
+      pressure: 3, 
+      wind: 5, 
+      precipitation: 1.4 
+    }[metric];
+
+    return { labels, data: sampleData(count, base, variability) };
   };
 
-  const current = range === 'hourly' ? sample.hourly : sample.daily;
-  // choose a line color based on current hour to match the TimeBasedBackground
-  const hour = (new Date()).getHours();
-  let lineColor = '#fb7185';
-  let fillColor = 'rgba(251,113,133,0.12)';
+  const current = generateData();
 
-  if (hour >= 5 && hour < 9) {
-    // morning: warm/orange
-    lineColor = '#fb923c';
-    fillColor = 'rgba(251,146,60,0.12)';
-  } else if (hour >= 9 && hour < 17) {
-    // day: blue
-    lineColor = '#60a5fa';
-    fillColor = 'rgba(96,165,250,0.12)';
-  } else if (hour >= 17 && hour < 20) {
-    // evening: pink/orange
-    lineColor = '#fb7185';
-    fillColor = 'rgba(251,113,133,0.12)';
-  } else {
-    // night: soft purple/gray
-    lineColor = '#a78bfa';
-    fillColor = 'rgba(167,139,250,0.08)';
-  }
+  // ----- COLOR PALETTE -----
+  const metricColors = {
+    temperature: { line: "#fb923c", fill: "rgba(251,146,60,0.15)" },
+    humidity: { line: "#60a5fa", fill: "rgba(96,165,250,0.15)" },
+    pressure: { line: "#a78bfa", fill: "rgba(167,139,250,0.12)" },
+    wind: { line: "#34d399", fill: "rgba(52,211,153,0.12)" },
+    precipitation: { line: "#38bdf8", fill: "rgba(56,189,248,0.12)" },
+  };
+
+  const colors = metricColors[metric];
+
+  // ----- TOOLTIP LABEL FORMATTER -----
+  const valueSuffix = {
+    temperature: "°C",
+    humidity: "%",
+    pressure: " hPa",
+    wind: " km/h",
+    precipitation: " mm",
+  }[metric];
 
   const chartData = {
     labels: current.labels,
     datasets: [
       {
-        label: range === 'hourly' ? 'Hourly' : 'Daily',
+        label: range === "1D" ? "1D" : "5D",
         data: current.data,
-        borderColor: lineColor,
-        backgroundColor: fillColor,
-        tension: 0.3,
-        pointRadius: range === 'hourly' ? 2 : 4,
-        pointBackgroundColor: lineColor
-      }
-    ]
+        borderColor: colors.line,
+        backgroundColor: colors.fill,
+        fill: true,
+        tension: 0.4,
+        pointRadius: range === "1D" ? 4 : 4,
+        pointBackgroundColor: colors.line,
+      },
+    ],
   };
 
   const options = {
     responsive: true,
     maintainAspectRatio: false,
-    plugins: {
-      legend: { display: false }
-    },
+    plugins: { legend: { display: false } },
     scales: {
-      x: { grid: { display: false }, ticks: { color: 'rgba(255,255,255,0.9)' } },
-      y: { grid: { color: 'rgba(255,255,255,0.06)' }, ticks: { color: 'rgba(255,255,255,0.9)' } }
-    }
+      x: {
+        grid: { display: false },
+        ticks: { color: "white", maxRotation: 0, font: { size: 11 } },
+      },
+      y: {
+        grid: { color: "rgba(255,255,255,0.05)" },
+        ticks: { color: "white", font: { size: 11 } },
+      },
+    },
   };
 
+  // ----- PANEL TITLE -----
+  const prettyMetric = metric.charAt(0).toUpperCase() + metric.slice(1);
+  const title = `${prettyMetric} — ${range}`;
+
   return (
-    <div className="neumorph p-6 w-full h-full">
+    <div className="neumorph p-2 w-full h-full rounded-xl">
+
+      {/* ----- CONTROLS AREA ----- */}
       <div className="flex items-center justify-between mb-4">
-        <div className="font-semibold text-m text-white/90">{range === 'hourly' ? 'Next 24 hours' : 'Next 7 day(s)'}</div>
-        <div className="flex items-center space-x-2">
-          <button onClick={() => setRange('hourly')} className={`px-3 py-1 rounded ${range==='hourly' ? 'bg-white/20 text-white' : 'text-white/60'}`}>Hourly</button>
-          <button onClick={() => setRange('daily')} className={`px-3 py-1 rounded ${range==='daily' ? 'bg-white/20 text-white' : 'text-white/60'}`}>Daily</button>
+        <div className=" text-white/95 text-sm font-semibold">
+          {title}
+        </div>
+          
+        {/* METRIC DROPDOWN */}
+        <select
+          value={metric}
+          onChange={(e) => setMetric(e.target.value)}
+          className="px-3 py-2 text-sm rounded-lg bg-white/10 text-white/95 neumorph-inset"
+        >
+          <option value="temperature">Temperature</option>
+          <option value="humidity">Humidity</option>
+          <option value="pressure">Pressure</option>
+          <option value="wind">Wind</option>
+          <option value="precipitation">Rain</option>
+        </select>
+
+        {/* RANGE BUTTONS (1D / 5D) */}
+        <div className="flex bg-white/10 rounded-xl neumorph-inset p-1">
+          {["1D", "5D"].map((r) => (
+            <button
+              key={r}
+              onClick={() => setRange(r)}
+              className={`px-4 py-1 rounded-lg text-sm transition-all ${
+                range === r
+                  ? "bg-white/10 text-white shadow-inner"
+                  : "text-white/50 hover:text-white/80"
+              }`}
+            >
+              {r}
+            </button>
+          ))}
         </div>
       </div>
-      <div className="w-full h-56">
+
+      {/* GRAPH */}
+      <div className="w-full h-60">
         <Line data={chartData} options={options} />
       </div>
     </div>

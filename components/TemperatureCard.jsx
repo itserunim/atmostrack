@@ -10,7 +10,7 @@ const Thermometer = ({ value = 28, min = 0, max = 100 }) => {
   const fillHeight = `calc(${pct}% - 8px)`;
 
   return (
-    <div className="neumorph h-full w-full flex items-center justify-center">
+    <div className="neumorph flex flex-col items-center justify-center p-4">
       <div className="thermo w-14 h-95 bg-transparent relative flex items-center justify-center">
         <div className="thermo-track absolute left-1/2 transform -translate-x-1/2 top-3 bottom-3 w-2 bg-white/20 rounded-full" />
         <div className="thermo-bulb absolute left-1/2 transform -translate-x-1/2 bottom-0 w-8 h-8 rounded-full bg-red-500 shadow-inner" />
@@ -63,6 +63,8 @@ const TemperatureCard = ({ min = 0, max = 100 }) => {
       <div className="w-full flex items-center justify-center">
         <Thermometer value={temperature} min={min} max={max} />
       </div>
+      <div className="font-semibold text-l text-blue-500 mt-4">Min: {min}°C</div>
+      <div className="font-semibold text-l text-red-500">Max: {max}°C</div>
     </div>
   );
 };

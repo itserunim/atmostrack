@@ -4,8 +4,9 @@ import TimeBasedBackground from "../components/TimeBasedBackground";
 import TemperatureCard from "../components/TemperatureCard";
 import HumidityCard from "../components/HumidityCard";
 import WindCard from "../components/WindCard";
+import PressureCard from "../components/PressureCard";
 import ForecastGraph from "../components/ForecastGraph";
-import MQTTPanel from "../components/MQTTPanel";
+import RainCard from "../components/RainCard";
 import ControlPanel from "../components/ControlPanel";
 import StatusIndicator from "../components/StatusIndicator";
 

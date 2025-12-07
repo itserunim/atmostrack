@@ -39,15 +39,15 @@ const HumidityCard = () => {
   }, []);
 
   return (
-    <div className="neumorph p-6 flex flex-col items-center justify-center w-full">
-      <h2 className="text-sm font-bold text-white/90 uppercase">Humidity</h2>
-      <div className="w-40 h-40 my-4">
+    <div className="neumorph p-6 flex flex-col items-center justify-center text-center w-full h-full">
+      <h2 className="text-xl font-bold text-white/95 uppercase tracking-wide">Humidity</h2>
+      <div className="w-40 h-40 my-4 font-semibold">
         <CircularProgressbar
           value={humidity}
           text={`${humidity}%`}
           styles={buildStyles({
             textColor: 'rgba(255,255,255,0.95)',
-            pathColor: '#60a5fa',
+            pathColor: '#60fa60ff',
             trailColor: 'rgba(255,255,255,0.12)',
           })}
         />
