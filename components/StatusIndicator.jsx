@@ -2,7 +2,7 @@
 import React from "react";
 
 const StatusIndicator = ({ status }) => {
-  const color = status === "online" ? "bg-green-500" : "bg-red-500";
+  const color = status === "Online" ? "bg-green-500" : "bg-red-500";
 
   return (
     <div className="neumorph flex items-center justify-center w-28 h-12 space-x-2">

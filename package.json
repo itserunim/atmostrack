@@ -3,19 +3,19 @@
   "version": "0.1.0",
   "private": true,
   "scripts": {
-    "dev": "next dev",
+    "dev": "nodemon --watch pages --watch components --watch lib --ext js,ts,tsx --exec \"next dev\"",
     "build": "next build",
     "start": "next start",
     "lint": "eslint"
   },
   "dependencies": {
     "chart.js": "^4.5.1",
-    "next": "^16.0.7",
-    "react": "19.2.0",
+    "mqtt": "^5.14.1",
+    "next": "^16.0.5",
+    "react": "^19.2.0",
     "react-chartjs-2": "^5.3.1",
     "react-circular-progressbar": "^2.2.0",
-    "react-dom": "19.2.0",
-    "react-gauge-component": "^1.2.64",
+    "react-dom": "^19.2.0",
     "react-icons": "^5.5.0"
   },
   "devDependencies": {
@@ -27,6 +27,7 @@
     "baseline-browser-mapping": "^2.9.0",
     "eslint": "^9",
     "eslint-config-next": "16.0.5",
+    "nodemon": "^3.1.11",
     "postcss": "^8.5.6",
     "tailwindcss": "^4.1.17",
     "typescript": "^5"
