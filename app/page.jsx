@@ -2,7 +2,6 @@ import React from "react";
 import TimeBasedBackground from "../components/TimeBasedBackground";
 import TemperatureCard from "../components/TemperatureCard";
 import HumidityCard from "../components/HumidityCard";
-import WindCard from "../components/WindCard";
 import PressureCard from "../components/PressureCard";
 import ForecastGraph from "../components/ForecastGraph";
 import RainCard from "../components/RainCard";
@@ -41,7 +40,7 @@ export default function DashboardPage() {
                     </div>
                 </header>
 
-                <div className="grid grid-cols-5 grid-rows-2 gap-6">
+                <div className="grid grid-cols-4 grid-rows-2 gap-6">
                                         
                     <div className="row-span-2 neumorph flex items-center justify-center p-4 w-full h-full">
                         <TemperatureCard current={30} min={15} max={45} />
@@ -54,17 +53,12 @@ export default function DashboardPage() {
                         <PressureCard pressure={1013} />
                     </div>
                     <div className="w-full h-full">
-                        <WindCard speed={20} direction={'SE'} />
-                    </div>
-
-                    <div className="w-full h-full">
                         <RainCard intensity={2.5} />
                     </div>
-                    <div className="col-start-5 row-start-2">
+                    <div className="col-start-4 row-start-2">
                         <ControlPanel initial={true} />
                     </div>
-
-                    <div className="col-span-3 col-start-2 row-start-2">
+                    <div className="col-span-2 col-start-2 row-start-2">
                         <ForecastGraph labels={sampleForecast.labels} data={[22,21,22,23,24,25,23]} />
                     </div>
                 </div>
