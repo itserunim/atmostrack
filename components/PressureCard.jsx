@@ -1,66 +1,56 @@
 "use client";
-import React, { useEffect, useRef, useState } from 'react';
-import dynamic from 'next/dynamic';
+import React, { useEffect, useRef, useState } from "react";
+import dynamic from "next/dynamic";
 
-const GaugeChart = dynamic(() => import('react-gauge-component'), { ssr: false });
+// Dynamically import the GaugeChart (client-side only)
+const GaugeChart = dynamic(() => import("react-gauge-component"), { ssr: false });
 
-const clamp = (v, a, b) => Math.max(a, Math.min(b, v));
-
-const PressureCard = ({ pressure: initial = 1013 }) => {
-  const [pressure, setPressure] = useState(initial);
-  const [containerWidth, setContainerWidth] = useState(0);
+export default function PressureCard({ pressure = null }) {
+  const [containerWidth, setContainerWidth] = useState(1);
   const containerRef = useRef(null);
 
-  // ---- PRESSURE CATEGORY ----
-  let category = '';
-  let description = '';
+  // Show placeholder if value not yet available
+  const displayPressure = pressure === null ? 1010 : pressure;
 
-  if (pressure < 995) category = 'very low';
-  else if (pressure < 1005) category = 'low';
-  else if (pressure < 1018) category = 'normal';
-  else if (pressure < 1030) category = 'high';
-  else category = 'high';
+  // Real atmospheric categories
+  let description = "";
+  if (pressure === null) description = "Waiting for data...";
+  else if (pressure < 995) description = "Very low pressure";
+  else if (pressure < 1008) description = "Unsettled weather";
+  else if (pressure < 1020) description = "Normal stable conditions";
+  else if (pressure < 1030) description = "Fair and clear weather";
+  else description = "Very high pressure";
 
-  if (category === 'very low') description = 'Stormy weather — expect significant changes.';
-  else if (category === 'low') description = 'Chance of rain — consider carrying an umbrella.';
-  else if (category === 'normal') description = 'Stable weather — no significant changes expected.';
-  else description = 'Likely clear skies — enjoy your day!';
-
-  // ---- SIMULATED PRESSURE UPDATES ----
   useEffect(() => {
-    const id = setInterval(() => {
-      setPressure(prev => {
-        const delta = (Math.random() - 0.5) * 1.2;
-        return clamp(Math.round((prev + delta) * 10) / 10, 950, 1050);
-      });
-    }, 2000);
-    return () => clearInterval(id);
-  }, []);
+    const container = containerRef.current;
+    if (!container) return;
 
-  // ---- MAKE GAUGE RESPONSIVE ----
-  useEffect(() => {
-    if (!containerRef.current) return;
+    // Set initial width immediately
+    setContainerWidth(container.offsetWidth);
 
     const resizeObserver = new ResizeObserver(() => {
-      setContainerWidth(containerRef.current.offsetWidth);
+      if (container) setContainerWidth(container.offsetWidth);
     });
 
-    resizeObserver.observe(containerRef.current);
+    resizeObserver.observe(container);
 
     return () => resizeObserver.disconnect();
   }, []);
 
-  // Map pressure (950-1050) to 0–100%
-  const min = 950;
-  const max = 1050;
-  const pct = Math.round(((pressure - min) / (max - min)) * 100);
+  // Fixed standard pressure scale: 950 → 1050 hPa
+  const minHpa = 950;
+  const maxHpa = 1050;
+  const pct = ((displayPressure - minHpa) / (maxHpa - minHpa)) * 100;
 
   return (
-    <div ref={containerRef} className="neumorph flex flex-col items-center justify-center w-full h-full text-center p-2">
-
+    <div
+      ref={containerRef}
+      className="neumorph flex flex-col items-center justify-center w-full max-h-60 text-center"
+    >
       <h2 className="text-xl font-bold text-white/95 uppercase tracking-wide">Pressure</h2>
 
-      <div className="w-full flex items-center justify-center mt-2">
+      {/* Responsive width container */}
+      <div className="w-full max-w-[150px] sm:max-w-md h-[120px] sm:h-60 flex items-center justify-center">
         <GaugeChart
           key={containerWidth}
           id="pressure-gauge"
@@ -72,28 +62,23 @@ const PressureCard = ({ pressure: initial = 1013 }) => {
             cornerRadius: 4,
             gradient: true,
             subArcs: [
-              { limit: 10, color: "#1d37e3ff" },
-              { limit: 30, color: "#4258e6ff" },
-              { limit: 50, color: "#f5f2e4ff" },
-              { limit: 70, color: "#ee9a5aff" },
-              { limit: 100, color: "#ef3817ff" }
-            ]
+              { limit: 10, color: "#1d37e3ff" }, // Very low
+              { limit: 30, color: "#4258e6ff" }, // Low
+              { limit: 50, color: "#f5f2e4ff" }, // Normal
+              { limit: 70, color: "#ee9a5aff" }, // High
+              { limit: 100, color: "#ef3817ff" }, // Very high
+            ],
           }}
-          pointer={{
-            type: "arrow",
-            color: "#ffffffff",
-            length: 0.7,
-            width: 15,
-            elastic: false
-          }}
+          labels={{ tickLabels: { hideMinMax: true, hideValue: true } }}
+          pointer={{ type: "arrow", color: "#ffffffff", length: 0.7, width: 8 }}
           animate={true}
         />
       </div>
 
-      <div className="text-2xl font-bold text-white/95 mt-2">{pressure} hPa</div>
-      <div className="text-sm text-white/95 mt-2">{description}</div>
+      <div className="text-sm font-bold text-white/95 mt-2">
+        {pressure === null ? "--" : displayPressure.toFixed(1)} hPa
+      </div>
+      <div className="text-sm text-white/80 mt-2">{description}</div>
     </div>
   );
-};
-
-export default PressureCard;
+}

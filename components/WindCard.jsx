@@ -1,83 +1,54 @@
 "use client";
-import React, { useState, useEffect } from "react";
+import React from "react";
 import { WiStrongWind, WiWindy, WiCloudyWindy } from "react-icons/wi";
 
-const MQTT_SERVER = "wss://broker.hivemq.com:8884/mqtt";
-const MQTT_TOF_TOPIC = "esp32/tof";
-const MQTT_DIR_TOPIC = "esp32/dir";  // <-- added
-
-export default function WindCard() {
-  const [tof, setTof] = useState(null);
-  const [direction, setDirection] = useState("N"); // <-- new
-
-  useEffect(() => {
-    const client = window.mqtt?.connect(MQTT_SERVER, {
-      clientId: "webclient-" + Math.random().toString(16).substring(2, 10),
-    });
-
-    client?.on("connect", () => {
-      console.log("Web: Connected to MQTT Broker");
-
-      client.subscribe(MQTT_TOF_TOPIC);
-      client.subscribe(MQTT_DIR_TOPIC); // <-- subscribe
-    });
-
-    client?.on("message", (topic, message) => {
-      const value = message.toString();
-
-      if (topic === MQTT_TOF_TOPIC) {
-        setTof(Number(value));
-      }
-
-      if (topic === MQTT_DIR_TOPIC) {
-        setDirection(value);   // <-- update direction live
-      }
-    });
-
-    return () => client?.end();
-  }, []);
-
-  const speed = tof ? Math.min(Math.floor(tof / 10), 120) : 0;
-
-  // Determine wind category
-  let category = "calm";
-  if (speed > 19 && speed <= 38) category = "breeze";
-  else if (speed > 38) category = "strong";
-
-  // Choose icon & description
-  let Icon = WiWindy;
-  let iconSize = "text-6xl";
-  let description = "The breeze makes you feel comfortable.";
-
-  if (category === "calm") {
-    Icon = WiWindy;
-    iconSize = "text-8xl";
-    description = "Calm conditions — pleasant and still.";
-  } else if (category === "breeze") {
-    Icon = WiCloudyWindy;
-    iconSize = "text-8xl";
-    description = "A gentle breeze — comfortable conditions.";
-  } else {
-    Icon = WiStrongWind;
-    iconSize = "text-6xl";
-    description = "Strong wind — secure loose objects and take care.";
+export default function WindCard({ speed = null, heading = null }) {
+  if (speed === null || heading === null) {
+    return (
+      <div className="neumorph flex flex-col items-center justify-center p-4">
+        <h2 className="text-xl font-bold text-white/95 uppercase mt-1">Wind</h2>
+        <div className="text-7xl text-white/50">--</div>
+        <div className="text-2xl font-bold text-white/50 mt-2">--</div>
+        <div className="text-sm text-white/80 mt-6">Waiting for data...</div>
+      </div>
+    );
   }
 
+  let deg360 = ((heading % 360) + 360) % 360;
+  const quadrantIndex = Math.floor(deg360 / 90);
+  let deg90 = deg360 % 90;
+  const TOLERANCE = 5;
+
+  let direction = "";
+  switch (quadrantIndex) {
+    case 0: direction = deg90 <= TOLERANCE ? "N" : "NE"; break;
+    case 1: direction = deg90 <= TOLERANCE ? "E" : "SE"; break;
+    case 2: direction = deg90 <= TOLERANCE ? "S" : "SW"; break;
+    case 3: direction = deg90 <= TOLERANCE ? "W" : "NW"; break;
+  }
+
+  const mirrorMap = {
+    "N": "S", "S": "N", "E": "W", "W": "E",
+    "NE": "SW", "SW": "NE", "SE": "NW", "NW": "SE"
+  };
+  const mirroredDirection = mirrorMap[direction] || direction;
+  let displayDeg = mirroredDirection.length === 2 ? 90 - deg90 : deg90;
+
+  let Icon = WiWindy;
+  let description = "";
+  if (speed <= 10) { Icon = WiWindy; description = "Calm conditions"; }
+  else if (speed <= 30) { Icon = WiCloudyWindy; description = "A gentle breeze"; }
+  else { Icon = WiStrongWind; description = "Strong wind"; }
+
   return (
-    <div className="neumorph p-6 flex flex-col items-center justify-center h-full w-full text-center">
-      <h2 className="text-sm font-bold text-white/90 uppercase">Wind</h2>
-
-      <div className={`${iconSize} text-white/95 my-2 transition-transform`}>
-        <Icon />
+    <div className="neumorph flex flex-col items-center justify-center p-4">
+      <h2 className="text-xl font-bold text-white/95 uppercase mt-1">Wind</h2>
+      <div className="text-7xl text-white/95 transition-transform"><Icon /></div>
+      <div className="text-2xl font-bold text-white/95 -mt-2">
+        {displayDeg.toFixed(0)}° {mirroredDirection}
       </div>
-
-      <div className="text-4xl font-bold text-white/95">
-        {speed} {direction}
-      </div>
-
-      <div className="text-sm text-white/80 mt-1">{speed} km/h</div>
-
-      <p className="text-sm text-white/70 mt-3">{description}</p>
+      <div className="text-md text-white/80 mt-1">{speed.toFixed(1)} m/s</div>
+      <p className="text-sm text-white/95 mt-2">{description}</p>
     </div>
   );
 }

@@ -1,50 +1,26 @@
 "use client";
-import React, { useState, useEffect } from "react";
+import React from "react";
 import { CircularProgressbar, buildStyles } from 'react-circular-progressbar';
 import 'react-circular-progressbar/dist/styles.css';
-import mqtt from "mqtt";
 
-const MQTT_SERVER = "wss://broker.hivemq.com:8884/mqtt";
-const MQTT_BME_TOPIC = "esp32/bme";
+const HumidityCard = ({ humidity = null }) => {
+  // Show placeholder if value not yet available
+  const displayHumidity = humidity === null ? 0 : humidity;
 
-const HumidityCard = () => {
-  const [humidity, setHumidity] = useState(0);
-  const [client, setClient] = useState(null);
-
-  // Connect to MQTT broker
-  useEffect(() => {
-    const mqttClient = mqtt.connect(MQTT_SERVER, {
-      clientId: "webclient-humidity-" + Math.random().toString(16).substring(2, 10),
-    });
-
-    mqttClient.on("connect", () => {
-      console.log("Connected to MQTT broker for BME280 humidity");
-      mqttClient.subscribe(MQTT_BME_TOPIC);
-    });
-
-    mqttClient.on("message", (topic, payload) => {
-      if (topic === MQTT_BME_TOPIC) {
-        try {
-          const data = JSON.parse(payload.toString());
-          if (data.humidity !== undefined) setHumidity(data.humidity);
-        } catch (e) {
-          console.error("Failed to parse BME message:", e);
-        }
-      }
-    });
-
-    setClient(mqttClient);
-
-    return () => mqttClient.end();
-  }, []);
+  let desc = "";
+  if (humidity === null) desc = "Waiting for data...";
+  else if (humidity < 30) desc = "Dry environment";
+  else if (humidity <= 60) desc = "Comfortable humidity";
+  else desc = "Humid environment";
 
   return (
-    <div className="neumorph p-6 flex flex-col items-center justify-center text-center w-full h-full">
-      <h2 className="text-xl font-bold text-white/95 uppercase tracking-wide">Humidity</h2>
-      <div className="w-40 h-40 my-4 font-semibold">
+    <div className="neumorph p-6 flex flex-col items-center text-center w-full h-60">
+      <h2 className="text-xl font-bold text-white/95 uppercase tracking-wide -m-1">Humidity</h2>
+
+      <div className="my-4" style={{ width: 120, height: 120 }}>
         <CircularProgressbar
-          value={humidity}
-          text={`${humidity}%`}
+          value={displayHumidity}
+          text={humidity === null ? "--%" : `${humidity.toFixed(1)}%`}
           styles={buildStyles({
             textColor: 'rgba(255,255,255,0.95)',
             pathColor: '#60fa60ff',
@@ -52,9 +28,8 @@ const HumidityCard = () => {
           })}
         />
       </div>
-      <p className="text-sm text-white/80">
-        {humidity > 70 ? 'Wetter environment.' : 'Comfortable environment.'}
-      </p>
+
+      <p className="text-sm text-white/80">{desc}</p>
     </div>
   );
 };

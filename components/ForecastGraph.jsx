@@ -1,6 +1,7 @@
 "use client";
-import React from "react";
+import React, { useState, useEffect } from "react";
 import { Line } from "react-chartjs-2";
+
 import {
   Chart as ChartJS,
   CategoryScale,
@@ -10,81 +11,98 @@ import {
   Title,
   Tooltip,
   Legend,
+  Filler
 } from "chart.js";
 
-ChartJS.register(CategoryScale, LinearScale, PointElement, LineElement, Title, Tooltip, Legend);
+ChartJS.register(CategoryScale, LinearScale, PointElement, LineElement, Title, Tooltip, Legend, Filler);
 
-const ForecastGraph = () => {
-  const [range, setRange] = React.useState("1D");   // 1D, 5D
-  const [metric, setMetric] = React.useState("temperature");
+// Helper to format labels nicely
+const formatLabel = (str) => str.split("_").map(w => w.charAt(0).toUpperCase() + w.slice(1)).join(" ");
 
-  // ----- RANGE LABELS -----
-  const labels1D = Array.from({ length: 12 }, (_, i) => `${8 + i}:00`); // 8AM–8PM
-  const labels5D = ["Day 1","Day 2","Day 3","Day 4","Day 5"];
+const ForecastGraph = ({ initialMetric = "temperature" }) => {
+  const [metric, setMetric] = useState(initialMetric);
+  const [range, setRange] = useState("1D");
+  const [labels, setLabels] = useState([]);
+  const [dataPoints, setDataPoints] = useState([]);
 
-  // ----- RANDOMIZED METRIC VALUES (demo only) -----
-  const sampleData = (n, base, v) =>
-    Array.from({ length: n }, (_, i) => {
-      const noise = Math.sin(i / 2) * v + (Math.random() - 0.5) * (v / 2);
-      return Math.round((base + noise) * 10) / 10;
-    });
-
-  const generateData = () => {
-    let labels = range === "1D" ? labels1D : labels5D;
-    let count = labels.length;
-
-    let base = { 
-      temperature: 28, 
-      humidity: 70, 
-      pressure: 1013, 
-      wind: 12, 
-      precipitation: 1 
-    }[metric];
-
-    let variability = { 
-      temperature: 2.3, 
-      humidity: 8, 
-      pressure: 3, 
-      wind: 5, 
-      precipitation: 1.4 
-    }[metric];
-
-    return { labels, data: sampleData(count, base, variability) };
-  };
-
-  const current = generateData();
-
-  // ----- COLOR PALETTE -----
   const metricColors = {
-    temperature: { line: "#fb923c", fill: "rgba(251,146,60,0.15)" },
-    humidity: { line: "#60a5fa", fill: "rgba(96,165,250,0.15)" },
-    pressure: { line: "#a78bfa", fill: "rgba(167,139,250,0.12)" },
-    wind: { line: "#34d399", fill: "rgba(52,211,153,0.12)" },
-    precipitation: { line: "#38bdf8", fill: "rgba(56,189,248,0.12)" },
+    temperature: { line: "#fb923c" },
+    humidity: { line: "#60a5fa" },
+    pressure: { line: "#a78bfa" },
+    wind_speed: { line: "#34d399" },
+    rain: { line: "#f87171" },
   };
+  const colors = metricColors[metric] || metricColors.temperature;
 
-  const colors = metricColors[metric];
+  // Fetch forecast from API whenever range changes
+  useEffect(() => {
+    const fetchForecast = async () => {
+      try {
+        const res = await fetch(`/api/hourlyReadings?range=${range}`);
+        const data = await res.json();
 
-  // ----- TOOLTIP LABEL FORMATTER -----
-  const valueSuffix = {
-    temperature: "°C",
-    humidity: "%",
-    pressure: " hPa",
-    wind: " km/h",
-    precipitation: " mm",
-  }[metric];
+        if (!Array.isArray(data)) return;
+
+        if (range === "1D") {
+          const currentHour = new Date().getHours();
+          const hourLabels = Array.from({ length: currentHour + 1 }, (_, i) => {
+            const h = i % 12 === 0 ? 12 : i % 12;
+            const ampm = i < 12 ? "AM" : "PM";
+            return `${h}:00 ${ampm}`;
+          });
+          const values = data.slice(-hourLabels.length).map((d) => d[metric] ?? 0);
+          setLabels(hourLabels);
+          setDataPoints(values);
+        }
+
+        if (range === "5D") {
+          const daysAgo = [4, 3, 2, 1, 0]; 
+          const dayLabels = daysAgo.map((d) => {
+            const date = new Date();
+            date.setDate(date.getDate() - d);
+            return date.toLocaleDateString([], { weekday: "short" });
+          });
+
+          const values = daysAgo.map((d) => {
+            const dayStart = new Date();
+            dayStart.setDate(dayStart.getDate() - d);
+            dayStart.setHours(0, 0, 0, 0);
+
+            const dayEnd = new Date(dayStart);
+            dayEnd.setHours(23, 59, 59, 999);
+
+            const dayData = data.filter((entry) => {
+              const ts = new Date(entry.timestamp);
+              return ts >= dayStart && ts <= dayEnd;
+            });
+
+            if (!dayData.length) return 0;
+            return dayData.reduce((sum, e) => sum + (e[metric] ?? 0), 0) / dayData.length;
+          });
+
+          setLabels(dayLabels);
+          setDataPoints(values);
+        }
+      } catch (err) {
+        console.error("Failed to fetch forecast:", err);
+      }
+    };
+
+    fetchForecast();
+  }, [range, metric]);
+
+  const maxValue = Math.max(...dataPoints) * 1.2 || 10;
 
   const chartData = {
-    labels: current.labels,
+    labels,
     datasets: [
       {
-        label: range === "1D" ? "1D" : "5D",
-        data: current.data,
+        label: formatLabel(metric),
+        data: dataPoints,
         borderColor: colors.line,
-        backgroundColor: colors.fill,
-        fill: true,
+        fill: false, // remove bottom faded area
         tension: 0.4,
-        pointRadius: range === "1D" ? 4 : 4,
+        pointRadius: 4,
         pointBackgroundColor: colors.line,
       },
     ],
@@ -93,56 +111,37 @@ const ForecastGraph = () => {
   const options = {
     responsive: true,
     maintainAspectRatio: false,
-    plugins: { legend: { display: false } },
+    plugins: {
+      legend: { display: false },
+      tooltip: { callbacks: { label: (ctx) => ctx.raw.toFixed(1) } },
+    },
     scales: {
-      x: {
-        grid: { display: false },
-        ticks: { color: "white", maxRotation: 0, font: { size: 11 } },
-      },
-      y: {
-        grid: { color: "rgba(255,255,255,0.05)" },
-        ticks: { color: "white", font: { size: 11 } },
-      },
+      x: { grid: { display: false }, ticks: { color: "white", font: { size: 11 } } },
+      y: { min: 0, max: maxValue, ticks: { color: "white", font: { size: 11 } }, grid: { color: "rgba(255,255,255,0.05)" } },
     },
   };
 
-  // ----- PANEL TITLE -----
-  const prettyMetric = metric.charAt(0).toUpperCase() + metric.slice(1);
-  const title = `${prettyMetric} — ${range}`;
-
   return (
     <div className="neumorph p-2 w-full h-full rounded-xl">
-
-      {/* ----- CONTROLS AREA ----- */}
       <div className="flex items-center justify-between mb-4">
-        <div className=" text-white/95 text-sm font-semibold">
-          {title}
-        </div>
-          
-        {/* METRIC DROPDOWN */}
+        <div className="text-white/95 text-sm font-semibold">{formatLabel(metric)} — {range}</div>
+
         <select
           value={metric}
           onChange={(e) => setMetric(e.target.value)}
           className="px-3 py-2 text-sm rounded-lg bg-white/10 text-white/95 neumorph-inset"
         >
-          <option value="temperature">Temperature</option>
-          <option value="humidity">Humidity</option>
-          <option value="pressure">Pressure</option>
-          <option value="wind">Wind</option>
-          <option value="precipitation">Rain</option>
+          {Object.keys(metricColors).map((m) => (
+            <option key={m} value={m}>{formatLabel(m)}</option>
+          ))}
         </select>
 
-        {/* RANGE BUTTONS (1D / 5D) */}
         <div className="flex bg-white/10 rounded-xl neumorph-inset p-1">
-          {["1D", "5D"].map((r) => (
+          {["1D","5D"].map((r) => (
             <button
               key={r}
               onClick={() => setRange(r)}
-              className={`px-4 py-1 rounded-lg text-sm transition-all ${
-                range === r
-                  ? "bg-white/10 text-white shadow-inner"
-                  : "text-white/50 hover:text-white/80"
-              }`}
+              className={`px-4 py-1 rounded-lg text-sm transition-all ${range===r ? "bg-white/10 text-white shadow-inner" : "text-white/50 hover:text-white/80"}`}
             >
               {r}
             </button>
@@ -150,7 +149,6 @@ const ForecastGraph = () => {
         </div>
       </div>
 
-      {/* GRAPH */}
       <div className="w-full h-60">
         <Line data={chartData} options={options} />
       </div>
