@@ -2,17 +2,13 @@
 import React, { useState, useEffect, useRef } from "react";
 import { WiRaindrop, WiRaindrops, WiRain, WiShowers } from 'react-icons/wi';
 
-// --- Convert raw analog rain sensor value to mm/h ---
 function convertAnalogRain(raw) {
   if (raw === null) return null;
 
-  // Invert: 0 = heavy rain, 4095 = no rain
   const inverted = 4095 - raw;
-
-  // Scale to mm/h (adjust divisor for your sensor)
   const mmh = inverted / 400;
 
-  return Math.max(0, mmh);  // prevent negatives
+  return Math.max(0, mmh);
 }
 
 export default function RainCard({ rainValue = null, online = true }) {
@@ -51,9 +47,9 @@ export default function RainCard({ rainValue = null, online = true }) {
 
   if (displayIntensity !== null) {
     if (displayIntensity === 0) { Icon = WiShowers; description = 'No rain'; }
-    else if (displayIntensity < 0.5) { Icon = WiShowers; description = 'Drizzle'; }
-    else if (displayIntensity < 2) { Icon = WiRaindrop; description = 'Light rain'; }
-    else if (displayIntensity < 10) { Icon = WiRaindrops; description = 'Moderate rain'; }
+    else if (displayIntensity < 1) { Icon = WiShowers; description = 'Drizzle'; }
+    else if (displayIntensity < 3) { Icon = WiRaindrop; description = 'Light rain'; }
+    else if (displayIntensity < 7) { Icon = WiRaindrops; description = 'Moderate rain'; }
     else { Icon = WiRain; description = 'Heavy rain'; }
   }
 
