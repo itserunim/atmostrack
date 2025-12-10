@@ -2,6 +2,19 @@
 import React, { useState, useEffect, useRef } from "react";
 import { WiRaindrop, WiRaindrops, WiRain, WiShowers } from 'react-icons/wi';
 
+// --- Convert raw analog rain sensor value to mm/h ---
+function convertAnalogRain(raw) {
+  if (raw === null) return null;
+
+  // Invert: 0 = heavy rain, 4095 = no rain
+  const inverted = 4095 - raw;
+
+  // Scale to mm/h (adjust divisor for your sensor)
+  const mmh = inverted / 400;
+
+  return Math.max(0, mmh);  // prevent negatives
+}
+
 export default function RainCard({ rainValue = null, online = true }) {
   const [displayIntensity, setDisplayIntensity] = useState(null);
   const totalRef = useRef(0);
@@ -16,12 +29,15 @@ export default function RainCard({ rainValue = null, online = true }) {
 
     const interval = setInterval(() => {
       if (rainValue !== null) {
-        bufferRef.current.push(rainValue);
+        const mmh = convertAnalogRain(rainValue);
+
+        bufferRef.current.push(mmh);
         if (bufferRef.current.length > 5) bufferRef.current.shift();
 
         const avg = bufferRef.current.reduce((a, b) => a + b, 0) / bufferRef.current.length;
         setDisplayIntensity(avg);
-        totalRef.current += avg / 3600; // accumulate mm per second
+
+        totalRef.current += avg / 3600;
       }
     }, 2000);
 
