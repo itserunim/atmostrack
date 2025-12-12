@@ -1,13 +1,15 @@
 "use client";
 import React, { useState, useEffect, useRef } from "react";
-import { WiRaindrop, WiRaindrops, WiRain, WiShowers } from 'react-icons/wi';
+import { WiRaindrop, WiRaindrops, WiRain, WiShowers } from "react-icons/wi";
 
+// Convert raw ESP32 analog rain value (0-4095) to mm/h
+// 4096 = dry, 0 = max rain
 function convertAnalogRain(raw) {
   if (raw === null) return null;
+  const value = Number(raw);
 
-  const inverted = 4095 - raw;
-  const mmh = inverted / 400;
-
+  // Invert: dry = 0, wet = max 10 mm/h
+  const mmh = ((4096 - value) / 4096) * 10;
   return Math.max(0, mmh);
 }
 
@@ -15,6 +17,13 @@ export default function RainCard({ rainValue = null, online = true }) {
   const [displayIntensity, setDisplayIntensity] = useState(null);
   const totalRef = useRef(0);
   const bufferRef = useRef([]);
+
+  // Keep latest rain value
+  const latestRain = useRef(rainValue);
+  useEffect(() => { 
+    latestRain.current = rainValue; 
+    console.log("ESP32 rain raw value:", rainValue); // DEBUG log
+  }, [rainValue]);
 
   useEffect(() => {
     if (!online) {
@@ -24,33 +33,35 @@ export default function RainCard({ rainValue = null, online = true }) {
     }
 
     const interval = setInterval(() => {
-      if (rainValue !== null) {
-        const mmh = convertAnalogRain(rainValue);
+      if (latestRain.current !== null) {
+        const mmh = convertAnalogRain(latestRain.current);
 
+        // Moving average (last 5 readings)
         bufferRef.current.push(mmh);
         if (bufferRef.current.length > 5) bufferRef.current.shift();
-
         const avg = bufferRef.current.reduce((a, b) => a + b, 0) / bufferRef.current.length;
+
         setDisplayIntensity(avg);
 
-        totalRef.current += avg / 3600;
+        // Accumulate total rainfall (mm) over 2 seconds
+        totalRef.current += avg * 2 / 3600;
       }
-    }, 2000);
+    }, 500); // update every 2 seconds
 
     return () => clearInterval(interval);
-  }, [rainValue, online]);
+  }, [online]);
 
-  const safeDisplay = val => val === null ? "--" : val.toFixed(2);
+  const safeDisplay = val => (val === null ? "--" : val.toFixed(2));
 
   let Icon = WiShowers;
   let description = online ? "Waiting for data..." : "Waiting for data...";
 
   if (displayIntensity !== null) {
-    if (displayIntensity === 0) { Icon = WiShowers; description = 'No rain'; }
-    else if (displayIntensity < 1) { Icon = WiShowers; description = 'Drizzle'; }
-    else if (displayIntensity < 3) { Icon = WiRaindrop; description = 'Light rain'; }
-    else if (displayIntensity < 7) { Icon = WiRaindrops; description = 'Moderate rain'; }
-    else { Icon = WiRain; description = 'Heavy rain'; }
+    if (displayIntensity === 0) { Icon = WiShowers; description = "No rain"; }
+    else if (displayIntensity < 1) { Icon = WiShowers; description = "Drizzle"; }
+    else if (displayIntensity < 3) { Icon = WiRaindrop; description = "Light rain"; }
+    else if (displayIntensity < 7) { Icon = WiRaindrops; description = "Moderate rain"; }
+    else { Icon = WiRain; description = "Heavy rain"; }
   }
 
   return (

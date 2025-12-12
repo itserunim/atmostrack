@@ -24,7 +24,7 @@ export default function DashboardPage() {
   const [humidity, setHumidity] = useState(null);
   const [pressure, setPressure] = useState(null);
   const [ledOn, setLedOn] = useState(false);
-  const [rainValue, setRainValue] = useState(null);
+  const [rainValue, setRainValue] = useState(null); // <- fixed
   const [lightValue, setLightValue] = useState(null);
   const [windMsPerRotation, setWindMsPerRotation] = useState(null);
   const [windSpeed, setWindSpeed] = useState(null);
@@ -98,8 +98,8 @@ export default function DashboardPage() {
 
           case TOPIC_RAIN: {
             if (!isNaN(num)) {
-              const rainMmPerHour = num / 2000; // scale to realistic mm/h
-              setRainValue(rainMmPerHour);
+              setRainValue(num);
+              console.log("MQTT rain received:", num); // <- debug
             } else {
               setRainValue(0);
             }
@@ -120,7 +120,6 @@ export default function DashboardPage() {
           default: console.warn("Unhandled topic:", topic, msg);
         }
 
-        // Save for hourly readings
         hourlyReadings.current = {
           temperature: !isNaN(temperature) ? temperature : 0,
           humidity: !isNaN(humidity) ? humidity : 0,
@@ -193,7 +192,6 @@ export default function DashboardPage() {
   return (
     <TimeBasedBackground lightValue={lightValue}>
       <div className="min-h-screen mx-auto p-4 space-y-4">
-        {/* Header */}
         <header className="neumorph p-4 flex flex-col sm:flex-row items-center justify-center sm:justify-between mb-6 h-18">
           <div className="flex sm:hidden items-center justify-center space-x-3 w-full">
             <img src="/atmostrack-logo.svg" alt="AtmosTrack" className="w-30 h-auto" />
@@ -225,7 +223,10 @@ export default function DashboardPage() {
           <div><HumidityCard humidity={espConnected ? humidity : null} /></div>
           <div><PressureCard pressure={espConnected ? pressure : null} /></div>
           <div><WindCard speed={espConnected ? windSpeed : null} heading={espConnected ? windHeading : null} /></div>
-          <div><RainCard rainValue={espConnected ? rainValue : null} /></div>
+
+          {/* ✅ Updated RainCard */}
+          <div><RainCard rainValue={espConnected ? rainValue : null} online={espConnected} /></div>
+
           <div className="sm:col-span-2 md:col-span-1 lg:col-start-5 lg:row-start-2">
             <ControlPanel initial={ledOn} online={espConnected} />
           </div>
